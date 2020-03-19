@@ -1,0 +1,29 @@
+{
+  "name": "incheck-server",
+  "version": "1.0.0",
+  "description": "*chill* dawg **chill**",
+  "main": "app.js",
+  "dependencies": {
+    "bcrypt": "^4.0.1",
+    "express": "^4.17.1",
+    "expressjs": "^1.0.1",
+    "mongoose": "^5.9.5"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.2"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "devstart": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ToTheFarWest/InCheck-Server.git"
+  },
+  "author": "Yarden Akin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ToTheFarWest/InCheck-Server/issues"
+  },
+  "homepage": "https://github.com/ToTheFarWest/InCheck-Server#readme"
+}
