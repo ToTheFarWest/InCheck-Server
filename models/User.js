@@ -1,45 +1,65 @@
-var mongoose = require('mongoose')
-var bcrypt = require('bcrypt')
-const SALT_WORK_FACTOR = 10
+var mongoose = require('mongoose');
+var bcrypt = require('bcrypt');
+const validator = require('validator');
+const jwt = require('jsonwebtoken');
+const SALT_WORK_FACTOR = 10;
 
-var Schema = mongoose.Schema
+var Schema = mongoose.Schema;
 
 var UserSchema = new Schema({
     username: {type: String, required: true},
-    email: {type: String, required: true, index: {unique: true}},
-    password: {type: String, required: true},
-    teams: [{type: Schema.Types.ObjectId, ref: 'Team'}]
-})
+    email: {
+        type: String,
+        required: true,
+        unique: true,
+        lowercase: true,
+        validate: val => {
+            if (!validator.isEmail(val)) {
+                throw new Error({error: 'Invalid Email address'});
+            }
+        }
+    },
+    password: {type: String, required: true, minlength: 7},
+    teams: [{type: Schema.Types.ObjectId, ref: 'Team'}],
+    tokens: [{
+        token: {
+            type: String,
+            required: true
+        }
+    }]
+});
 
-// //Password hashing
-// UserSchema.pre('save', (next) => {
-//     var user = this;
-//     //Only hash the password if it has been modified
-//     if (!user.isModified('password')) return next();
+//Middleware
+UserSchema.pre('save', async function (next) {
+    //Hash the password before saving the user model
+    const user = this;
+    if (user.isModified('password')) {
+        user.password = await bcrypt.hash(user.password, 8);
+    }
+    next();
+});
 
-//     //Generate a salt
-//     bcrypt.genSalt(SALT_WORK_FACTOR, (err, salt) => {
-//         if (err) return next(err);
+UserSchema.methods.generateAuthToken = async function() {
+    //Generates an auth token for the user
+    const user = this;
+    const token = jwt.sign({_id: user._id}, process.env.JWT_KEY);
+    user.tokens = user.tokens.concat({token});
+    await user.save();
+    return token;
+};
 
-//         //Hash password with salt
-//         bcrypt.hash(user.password, salt, (err, hash) => {
-//             if (err) return next(err)
+UserSchema.statics.findByCredentials = async function (email, password) {
+    //Searches for a user by email and password
+    const user = await User.findOne({ email });
+    if (!user) {
+        throw new Error({ error: "Invalid login credentials" });
+    }
+    const isPasswordMatch = await bcrypt.compare(password, user.password);
+    if (!isPasswordMatch) {
+        throw new Error({ error: 'Invalid login credentials' });
+    }
+    return user;
+};
 
-//             //Override user password with hash
-//             user.password = hash
-
-//             //Callback
-//             next()
-//         })
-//     })
-// })
-
-// //Compare passwords
-// UserSchema.methods.comparePassword = (password, next) => {
-//     bcrypt.compare(password, this.password, (err, isMatch) => {
-//         if (err) return next(err)
-//         next(null, isMatch)
-//     })
-// }
-
-module.exports = mongoose.model('User', UserSchema)
+const User = mongoose.model('User', UserSchema);
+module.exports = User;
