@@ -1,30 +1,38 @@
 const express = require('express');
-const userController = require('../controllers/userController');
+const controller = require('../controllers/userController');
 const auth = require('../middleware/auth');
 router = express.Router();
 
 router.get('/', (req, res) => {
-    return userController.get_all_users(req, res);
+    return controller.get_all_users(req, res);
 });
 
 router.get('/id/:id', (req, res) => {
-    return userController.user_get(req, res);
+    return controller.user_get(req, res);
 });
 
 router.get('/me', auth, (req, res) => {
-    return userController.user_get_self(req, res);
+    return controller.user_get_self(req, res);
 });
 
 router.post('/', async (req, res) => {
-    return await userController.user_create(req, res);
+    return await controller.user_create(req, res);
 });
 
 router.post('/login', async (req, res) => {
-    return await userController.user_login(req, res);
+    return await controller.user_login(req, res);
+});
+
+router.get('/logout', auth, async (req, res) => {
+    return await controller.user_logout(req, res);
+});
+
+router.get('/logout-all', auth, async (req, res) => {
+    return await controller.user_logout_all(req, res);
 });
 
 router.get('/delete', auth,  async (req, res) => {
-    return await userController.user_delete(req, res);
+    return await controller.user_delete(req, res);
 });
 
 module.exports = router;
