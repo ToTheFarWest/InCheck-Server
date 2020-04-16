@@ -4,12 +4,12 @@ const auth = require('../middleware/auth');
 
 router = express.Router();
 
-router.get('/', (req, res) => {
-    res.send('Teams GET route!');
+router.get('/', auth, async (req, res) => {
+    return await controller.user_teams_list(req, res);
 });
 
-router.post('/', (req, res) => {
-    return controller.team_create_post(req, res);
+router.post('/', auth, (req, res) => {
+    return controller.team_create(req, res);
 });
 
 router.get('/:team/messages', auth, async (req, res) => {
