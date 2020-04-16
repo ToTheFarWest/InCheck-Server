@@ -8,12 +8,16 @@ router.get('/', auth, async (req, res) => {
     return await controller.user_teams_list(req, res);
 });
 
-router.post('/', auth, (req, res) => {
-    return controller.team_create(req, res);
+router.post('/', auth, async (req, res) => {
+    return await controller.team_create(req, res);
 });
 
 router.get('/:team/messages', auth, async (req, res) => {
-    return controller.team_get_all_messages(req, res);
+    return await controller.team_get_all_messages(req, res);
+});
+
+router.get('/:team/delete', auth, async (req, res) => {
+    return await controller.team_delete(req, res);
 });
 
 module.exports = router;
