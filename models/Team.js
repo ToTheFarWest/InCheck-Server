@@ -4,7 +4,7 @@ var Schema = mongoose.Schema;
 var TeamSchema = new Schema({
     name: {type: String, required: true},
     leader: {type: Schema.Types.ObjectId, ref: 'User', required: true},
-    members: [{type: Schema.Types.ObjectId, ref: 'User'}] 
+    members: [{type: Schema.Types.ObjectId, ref: 'User'}]
 });
 
 module.exports = mongoose.model('Team', TeamSchema);
