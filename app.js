@@ -9,6 +9,11 @@ const cors = require('cors');
 const helmet = require('helmet');
 const morgan = require('morgan');
 
+//Bind environment variables from .env file
+if (process.env.NODE_ENV !== "production") {
+    require('dotenv').config();
+}
+
 //Bind utilities to apps
 app.use(helmet());
 app.use(bodyParser.json());
@@ -20,7 +25,7 @@ app.use('/teams', team_router);
 app.use('/users', user_router);
 
 //Database setup
-var mongoDB = 'mongodb+srv://yarden:kRYfRva4Vh79oPki@cluster0-qfspe.mongodb.net/test?retryWrites=true&w=majority';
+var mongoDB = process.env.DB;
 mongoose.connect(mongoDB, {useNewUrlParser: true});
 
 const db = mongoose.connection;
