@@ -16,6 +16,10 @@ router.get('/:team', auth, async (req, res) => {
     return await controller.team_get(req, res);
 });
 
+router.get('/:team/invite', auth, async (req, res) => {
+    return await controller.team_invite(req, res);
+});
+
 router.get('/:team/messages', auth, async (req, res) => {
     return await controller.team_get_all_messages(req, res);
 });

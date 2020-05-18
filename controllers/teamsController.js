@@ -17,7 +17,7 @@ exports.user_teams_list = async function (req, res) {
 
 exports.team_get = async function(req, res) {
     try {
-        const team = await Team.findById(req.params.team);
+        const team = await Team.findById(req.params.team).populate('leader members', 'username');
         if (!team)
         {
             return res.status(404).json({error: "That server was not found"});
@@ -115,8 +115,32 @@ exports.team_get_all_messages = async function (req, res) {
         if (team.members.some(member => member.equals(req.user._id) == false)) {
             return res.status(403).json({error: "You do not have permission to access this resource."});
         }
-        messages = await Message.find({team: team});
+        messages = await Message.find({team: team}).populate('author', 'username');
         res.status(200).json({messages: messages});
+    }
+    catch (error) {
+        res.status(500).send({error: error});
+    }
+};
+
+exports.team_invite = async function (req, res) {
+    try{
+        const team = await Team.findById(req.params.team);
+        const user = await User.findById(req.query.user);
+        if (!team) {
+            return res.status(404).json({error: "That team was not found"});
+        }
+        if (!user) {
+            return res.status(404).json({error: "That user was not found"});
+        }
+        //Checks if user is the team leader
+        if (team.leader.equals(req.user._id) == false) {
+            return res.status(403).json({error: "You must be the team leader to invite new members"});
+        }
+        //Adds user to team
+        team.members.push(user._id);
+        user.teams.push(team._id);
+        team.save();
     }
     catch (error) {
         res.status(500).send({error: error});
